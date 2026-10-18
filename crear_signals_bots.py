@@ -76,8 +76,9 @@ def main():
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("--server", default="http://localhost:8080",
                    help="URL de Seq para la API REST (host)")
-    p.add_argument("--seqcli-server", default="http://localhost",
-                   help="URL de Seq que ve seqcli (dentro de Docker: localhost)")
+    p.add_argument("--seqcli-server", default=None,
+                   help="URL de Seq que ve seqcli. Default: http://localhost "
+                        "si --seqcli es docker, si no la misma que --server")
     p.add_argument("--apikey", default=os.environ.get("SEQ_API_KEY"))
     p.add_argument("--seqcli", default="seqcli",
                    help="Comando seqcli (acepta espacios p/ Docker)")
@@ -89,6 +90,9 @@ def main():
     args = p.parse_args()
     if not args.apikey:
         sys.exit("Falta --apikey o SEQ_API_KEY")
+    if args.seqcli_server is None:
+        args.seqcli_server = ("http://localhost" if "docker" in args.seqcli
+                              else args.server)
 
     if args.codigo:
         codigos = [args.codigo.upper()]
